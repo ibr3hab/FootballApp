@@ -1,0 +1,33 @@
+.header{
+    display: flex;
+    align-items: center;
+    padding: 20px 20px;
+    margin-left: 20px;
+}
+
+
+  .navbar {
+    display: flex; /* Use flexbox for horizontal alignment */
+    justify-content: flex-end; /* Align items to the right */
+    margin-left: 42em;
+      padding: 10px 20px; /* Padding for top/bottom and left/right */
+  }
+  
+  .navbar a {
+    color: white; 
+    text-decoration: none; 
+    padding: 10px 15px; /* Padding around links */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effect */
+    border-radius: 5px; /* Slightly rounded corners */
+  }
+  
+  .navbar a:hover {
+    background-color: #555; /* Darker background on hover */
+    color: white; /* Change text color on hover */
+  }
+  
+  .navbar a.active {
+    background-color: white; /* Highlight active link */
+    color: #333; /* Dark text color for active link */
+  }
+  
