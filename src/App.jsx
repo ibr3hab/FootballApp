@@ -7,6 +7,8 @@ import ClubDetails from "./components/Clubs.jsx/ClubsDetails";
 import { FavProvider } from "./components/Favourites/Favourites";
 import Players from "./components/Players/players";
 import News from "./components/News/News";
+import Standings from "./components/Standings/Standings";
+import Fixtures from "./components/Fixtures/fixtures";
 
 
 
@@ -26,6 +28,8 @@ function App() {
         <Route path="/clubs/:id" element={<ClubDetails/>}/>
         <Route path="/players/:teamId" element={<Players />} />
         <Route path="/latestnews" element={<News/>}/>
+        <Route path="/standings" element={<Standings/>}/>
+        <Route path="/fixtures" element={<Fixtures/>}/>
       </Routes>
     </>
     </FavProvider>

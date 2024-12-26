@@ -1,5 +1,5 @@
 const BASE_URL = "https://free-api-live-football-data.p.rapidapi.com";
-const API_KEY = "d49dc479c3msh399711e6e2890f4p14acf4jsn800cbde9d79f";
+const API_KEY = "0537792f42msh33121733302c74ep11083ajsn69bb53f75b5f";
 
 const headers = {
   'x-rapidapi-key': API_KEY,
@@ -52,13 +52,17 @@ export const sofascoreAPI = {
        fetchAPIdetails("/football-get-player-logo",{playerid})
   ),
 
-  getNews:(leagueid , page)=>{
+  getNews:(leagueid , page)=>(
       fetchAPIdetails("/football-get-league-news", {leagueid , page})
-  },
+  ),
 
-  getStandings:(leagueid)=>{
-     fetchAPIdetails("/football-get-standing-all",{leagueid});
-  }
+  getStandings:(leagueid)=>(
+     fetchAPIdetails("/football-get-standing-all",{leagueid})
+  ),
+
+  getFixtures:(date)=>(
+    fetchAPIdetails("/football-get-matches-by-date",{date})
+  )
 }
 
 

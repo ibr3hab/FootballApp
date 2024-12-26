@@ -6,6 +6,8 @@ import {
   FormControl,
   InputLabel,
   CircularProgress,
+  Pagination,
+  Stack,
 } from "@mui/material";
 import { sofascoreAPI } from "../../utils/api";
 import { Link } from "react-router-dom";
@@ -14,9 +16,11 @@ const News = () => {
   const [selectedLeagueId, setSelectedLeagueId] = useState("42");
   const [error, setError] = useState(null);
   const [news, setNews] = useState([]);
+  const [paginatedNews, setPaginatedNews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [hasMoreNews  , setHasmoreNews ] = useState(true);
+
+  const newsPerPage = 10;
 
   const leagueOptions = [
     { value: "42", label: "Champions League" },
@@ -26,52 +30,38 @@ const News = () => {
     { value: "54", label: "Bundesliga" },
   ];
 
-  const fetchNews = async (leagueId, pageNum) => {
-    setError(null)
-    setLoading(false);
+  const fetchNews = async (leagueId) => {
+    setError(null);
+    setLoading(true);
     try {
-      const data = await sofascoreAPI.getNews(leagueId, pageNum);
-      if (data && data.status === "success") {
-        if (
-          data.response &&
-          typeof data.response === "object" &&
-          Array.isArray(data.response.news)
-        ) {
-          const newsItems = data.response.news;
-          if (newsItems.length > 0) {
-            setNews((prevNews) => (pageNum === 1 ? newsItems : [...prevNews, ...newsItems]));
-            setHasmoreNews(newsItems.length === 10); // Assuming 10 items per page
-          } else {
-            setHasmoreNews(false);
-            if (pageNum === 1) {
-              setNews([]);
-            }
-          }
-        } else {
-          console.error("Invalid data structure in response:", data.response);
-          throw new Error("Unexpected API response structure");
-        }
+      const data = await sofascoreAPI.getNews(leagueId);
+      if (data?.status === "success" && Array.isArray(data.response?.news)) {
+        setNews(data.response.news);
+        console.log("News : ",news.length)
       } else {
-        console.error("API call failed or status is not success:", data);
-       
+        throw new Error("Unexpected API response structure");
       }
-      
     } catch (err) {
-      setError("Error fetching API details");
-      console.error("Error fetching data:", err);
+      setError("Error fetching news. Please try again.");
     } finally {
       setLoading(false);
     }
-   }
-  
+  };
 
   useEffect(() => {
-    fetchNews(selectedLeagueId, page);
-  }, [selectedLeagueId, page]);
+    setPage(1); // Reset page to 1 whenever the league changes
+    fetchNews(selectedLeagueId);
+  }, [selectedLeagueId]);
 
-  const handleMore = ()=>{
-    setPage(prevValue => prevValue + 1);
-  }
+  useEffect(() => {
+    const startIndex = (page - 1) * newsPerPage;
+    const endIndex = startIndex + newsPerPage;
+    setPaginatedNews(news.slice(startIndex, endIndex));
+  }, [page, news]); // Update paginated news when page or news changes
+
+  const handlePaginationChange = (event, value) => {
+    setPage(value); // Update the page when user clicks next/previous
+  };
 
   if (loading) {
     return (
@@ -90,6 +80,8 @@ const News = () => {
 
   return (
     <div style={{ marginTop: "60px" }}>
+     
+     <div style={{marginLeft : "42em"}}>
       <h2>News</h2>
       {error && (
         <p className="error-message" role="alert">
@@ -99,7 +91,7 @@ const News = () => {
 
       {!loading && !error && news.length === 0 && <p>No news found.</p>}
 
-      <FormControl style={{ width: "14%" }}>
+      <FormControl style={{ width: "24%"}}>
         <InputLabel>Leagues</InputLabel>
         <Select
           value={selectedLeagueId}
@@ -113,17 +105,45 @@ const News = () => {
         </Select>
       </FormControl>
 
+      {/* Pagination Component */}
+      {news.length > 0 && (
+        <Stack
+          spacing={2}
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Pagination
+            count={Math.ceil(news.length / newsPerPage)}
+            page={page}
+            onChange={handlePaginationChange}
+            color="primary"
+          />
+        </Stack>
+      )}
+
+       </div>
+
       <div className="footy-card">
-        {news.map((n) => (
-          <div className="footy" key={n.id}>
-            <img src={n.imageUrl} alt={n.title} />
-            <p>{n.title  || "No title available"}</p>
+        {paginatedNews.map((n) => (
+          <div className="card" key={n.id}>
+            <img
+              src={n.imageUrl || "/default-image-path.jpg"}
+              alt={n.title || "No title available"}
+              style={{ width: "200px", height: "160px" }}
+            />
+            <p>{n.title || "No title available"}</p>
             <p>{n.sourceStr}</p>
-            <p><Link to={n.page.url}>View details</Link></p>
+            <p>
+              <Link to={n.page?.url || "#"}>View details</Link>
+            </p>
           </div>
         ))}
-        {!loading && hasMoreNews && <Button onClick={handleMore}>Load More</Button>}
       </div>
+
+      
     </div>
   );
 };
