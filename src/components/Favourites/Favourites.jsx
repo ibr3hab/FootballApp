@@ -35,7 +35,7 @@ const Favourites = () => {
         {fav.length > 0 ? (
           fav.map((footy) => (
             <div key={footy.id} className="card">
-              <h2>{footy.name || "No Name is available"}</h2>
+              <h2>{footy.name || footy.leagueName ||"No Name is available"}</h2>
               <p>{footy.teamName || <img src={footy.logo} alt={footy.name}/> || "No team available"}</p>
               
               <p>Type: {footy.type || "No type available"}</p>

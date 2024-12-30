@@ -16,4 +16,11 @@ table {
   tr:nth-child(even) {
     background-color: #f9f9f9;
   }
+
+  img{
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+  }
   

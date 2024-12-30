@@ -1,4 +1,4 @@
-import React , {useEffect , useState} from "react";
+import React , {useEffect , useState, useRef } from "react";
 import {CircularProgress , InputLabel, MenuItem , Select , FormControl } from "@mui/material";
 import { sofascoreAPI } from "../../utils/api";
 import "./Standings.css";
@@ -21,25 +21,40 @@ const Standings = ()=>{
     const [selectedLeagueId , setSelectedId] = useState(leagueOptions[0].value);
     const [standings , setStandings] = useState([])
     const [loading , setLoading] = useState(false);
+    const isStanding = useRef(false);
 
 
     
     const fetchStandings = async (leagueid) => {
+         
+      if(isStanding.current)return;
+      isStanding.current = true;
+
+
+
+
         setLoading(true);
         try {
             const data = await sofascoreAPI.getStandings(leagueid);
 
-            if (data?.status === "success" && data.response?.standing) {
-                setStandings(data.response.standing);
-            } else if (data?.status !== "success") {
-                console.error(`API error: ${data?.status}`, data);
-            } else {
-                console.error("Unexpected data structure:", JSON.stringify(data, null, 2));
+           const teamsWithLogo = await Promise.all(
+            data.response.standing.map(async(player)=>{
+            try{
+              const logoResponse = await sofascoreAPI.getTeamsLogo(player.id)
+              return {...player , imageUrl : logoResponse.response.url}
+            }catch(err){
+              console.error("Error fetching the data",err);
+              return{...player , imageUrl : null }
             }
+            }       
+           )
+          )
+          setStandings(teamsWithLogo);
         } catch (err) {
             console.error("Error fetching data:", err);
         } finally {
             setLoading(false);
+            isStanding.current = false;
         }
     };
       
@@ -47,6 +62,9 @@ const Standings = ()=>{
 
     useEffect(()=>{
      fetchStandings(selectedLeagueId)
+     return ()=>{
+      isStanding.current = false;
+     };
     },[selectedLeagueId])
 
     if (loading) {
@@ -100,7 +118,8 @@ const Standings = ()=>{
       {standings.map((stand , index) => (
         <tr key={stand.id}>
           <td>{index + 1}</td>
-          <td>{stand.name}</td>
+          <td> <img src={stand.imageUrl} alt={stand.name}/>
+                             {stand.name}</td>
           <td>{stand.played}</td>
           <td>{stand.wins}</td>
           <td>{stand.draws}</td>

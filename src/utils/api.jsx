@@ -1,42 +1,44 @@
 const BASE_URL = "https://free-api-live-football-data.p.rapidapi.com";
-const API_KEY = "0537792f42msh33121733302c74ep11083ajsn69bb53f75b5f";
+const API_KEY = import.meta.env.VITE_API_KEY
 
 const headers = {
   'x-rapidapi-key': API_KEY,
   'x-rapidapi-host': "free-api-live-football-data.p.rapidapi.com"
 };
 
+ let apiCallCount = 0
 
-
-export const fetchAPIdetails = async (endpoint, params = {}) => {
-    const url = new URL(`${BASE_URL}${endpoint}`);
-    Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
-  
-     
-    const options = {
-      method: "GET",
-      headers,
-    };
-  
-    try {
-      const response = await fetch(url, options);
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  export const fetchAPIdetails = async (endpoint, params = {}) => {
+      apiCallCount ++;
+      const url = new URL(`${BASE_URL}${endpoint}`);
+      Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
+      
+      
+      const options = {
+        method: "GET",
+        headers,
+      };
+    
+      try {
+        const response = await fetch(url, options);
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    
+        const results = await response.json();
+        console.log("API Response:", results);
+        console.log(`The no of times api is getting called ${apiCallCount}`);
+        return results;
+      } catch (err) {
+        console.error("Error fetching the details:", err);
+        throw err;
       }
-  
-      const results = await response.json();
-      console.log("API Response:", results); // Log raw API response
-      return results;
-    } catch (err) {
-      console.error("Error fetching the details:", err);
-      throw err;
-    }
-  };
+    };
   
 export const sofascoreAPI = {
   search: (search) => 
-    fetchAPIdetails("/football-players-search", {search}),
+    fetchAPIdetails("/football-all-search", {search}),
   
    getTeamDetails : (teamid) =>(
     fetchAPIdetails("/football-league-team", {teamid})
@@ -62,6 +64,10 @@ export const sofascoreAPI = {
 
   getFixtures:(date)=>(
     fetchAPIdetails("/football-get-matches-by-date",{date})
+  ) , 
+
+  getTeamsLogo:(teamid)=>(
+     fetchAPIdetails("/football-team-logo",{teamid})
   )
 }
 

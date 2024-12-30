@@ -22,7 +22,7 @@ function App() {
     <> 
       <Header />
       <Routes>
-        <Route path="/" element={<SearchBar/>} />
+        <Route path="/" element={<SearchBar/>}/>
         <Route path="/favourites" element={<Favourites/>} />
         <Route path="/clubs" element={<Clubs/>}/>
         <Route path="/clubs/:id" element={<ClubDetails/>}/>
